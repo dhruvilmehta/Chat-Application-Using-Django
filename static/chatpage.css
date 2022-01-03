@@ -1,0 +1,37 @@
+body{
+    background-color: #aa96da;
+}
+#messages{
+    background-color: #eaeaea;
+    height:500px;
+    border:2px solid black;
+    overflow-y: auto;
+    width: 60%;
+    margin: 20px auto;
+}
+#messagesubmit{
+    width: 60%;
+    margin: auto;
+    display: inline;
+    margin-left: 272px;
+}
+#logoutForm{
+    border-radius: 10%;
+    width:50%;
+    display:inline;
+    margin-left: 341px;
+}
+h5{
+    font-size:  1.25rem;
+    margin:20px;
+}
+#sendbutton{
+    border-radius: 10%;
+}
+
+#logoutbutton{
+    border-radius: 10%;
+}
+#messageinput{
+    border-radius: 7px 7px 7px 7px;
+}

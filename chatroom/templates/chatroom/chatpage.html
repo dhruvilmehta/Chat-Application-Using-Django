@@ -1,0 +1,89 @@
+{% extends 'chatroom/base.html' %}
+{% block title %}
+    Chatpage
+{% endblock %}
+
+{% block style %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'chatpage.css' %}">
+{% endblock style %}
+    
+{% block content %}
+     <h5>Welcome, {{ username }}</h5>
+    
+    <div id="messages">
+
+    </div>
+    <form method="POST" id="messagesubmit" action="messagesubmit/">
+        {% csrf_token %}
+        <input type="hidden" value="{{username}}" name="username">
+        <input type="hidden" value="{{roomcode}}" name="roomcode">
+        <span>Enter Your Message : </span> <input type="text" name="message" id="messageinput">
+        <input type="submit" id="sendbutton" value="Submit">
+    </form>
+
+    <form action="logout" method="POST" id="logoutForm">
+        {% csrf_token %}
+        {% if hostname %}
+            <input type="hidden" value="{{hostname}}" name="hostname">
+            <input type="hidden" value="{{roomcode}}" name="roomcode">
+        {% endif %}
+            <input type="submit" value="Logout" id="logoutbutton">
+    </form>
+    <script>
+
+        
+        let fetchmessage=document.getElementById('messagesubmit')
+        fetchmessage.addEventListener('submit',messagesubmit)
+        messagesdiv=document.getElementById('messages')
+        function messagesubmit(event){
+            event.preventDefault()
+            myForm = event.target
+            myFormData=new FormData(myForm)
+            url=myForm.getAttribute("action")
+            method=myForm.getAttribute("method")
+            xhr=new XMLHttpRequest();
+            xhr.open(method,url)
+            xhr.setRequestHeader("HTTP_X_REQUESTED_WITH","XMLHttpRequest")
+            xhr.setRequestHeader("X-Requested-With","XMLHttpRequest")
+            xhr.onload=function(){
+                const serverresponse=xhr.response
+                messageJson=JSON.parse(serverresponse)
+                // console.log(messageJson.name)
+                myForm.reset()
+                messageelement=message(messageJson)  // new message 
+                initialmessages=messagesdiv.innerHTML // initial messages 
+                finalmessages= initialmessages+messageelement // add final message to initial messages 
+                messagesdiv.innerHTML=finalmessages // appending to messages div 
+            }
+            xhr.send(myFormData)
+        }
+
+        function message(message){
+            messagediv="<div>"+message.name+": "+message.message+"</div>"
+            return messagediv
+        }
+
+        function displaymessages(messagesdiv){
+            messagestr=""
+            xhr=new XMLHttpRequest()
+            xhr.open('GET','/messages/{{roomcode}}')
+            xhr.onload=function() {
+                response=xhr.response
+                //console.log(response)
+                responsejson=JSON.parse(response)
+                for(let i=0;i<responsejson.list.length;i++){
+                     //console.log(responsejson.list[i])
+                     currentstr=message(responsejson.list[i])
+                     messagestr += currentstr
+
+                }
+                messagesdiv.innerHTML=messagestr
+                // console.log("abcd")
+            }
+            xhr.send()
+        }
+        //displaymessages(messagesdiv)
+        setInterval(displaymessages,1000,messagesdiv)
+    </script>
+{% endblock %}
